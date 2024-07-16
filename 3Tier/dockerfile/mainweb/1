@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: "2024-05-20T01:38:35Z"
+  labels:
+    app: mainweb
+  name: mainweb-service
+  namespace: default
+  resourceVersion: "1265721"
+  uid: c5a259e1-a20c-4af7-874b-402f730fcf4b
+spec:
+  clusterIP: 172.20.114.0
+  clusterIPs:
+  - 172.20.114.0
+  externalTrafficPolicy: Cluster
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - nodePort: 30200
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: mainweb
+  sessionAffinity: None
+  type: NodePort
+status:
+  loadBalancer: {}

@@ -1,0 +1,103 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  generation: 1
+  labels:
+    app: loginweb
+    key: login
+  name: loginweb
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: loginweb
+      key: login
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: loginweb
+        key: login
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: key
+                  operator: In
+                  values:
+                  - login
+              topologyKey: topology.kubernetes.io/zone
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              key: login
+      containers:
+      - image: 381491927681.dkr.ecr.ap-northeast-2.amazonaws.com/login:v3.1
+        imagePullPolicy: IfNotPresent
+        name: loginnginx
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        ports:
+        - containerPort: 80
+        readinessProbe:
+          tcpSocket:
+            port: 80
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            port: 80
+          initialDelaySeconds: 15
+          periodSeconds: 10
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: loginweb
+  name: loginweb-svc
+  namespace: default
+spec:
+  clusterIP: 172.20.0.2
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+    nodePort: 30100
+  selector:
+    app: loginweb
+    key: login
+  sessionAffinity: None
+  type: NodePort
+status:
+  loadBalancer: {}
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: loginhpa
+spec:
+  maxReplicas: 5 
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: loginweb
+  targetCPUUtilizationPercentage: 60

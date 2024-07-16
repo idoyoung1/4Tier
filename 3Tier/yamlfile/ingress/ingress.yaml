@@ -1,0 +1,46 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: 4tier
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-northeast-2:654654194175:certificate/6a3dde0a-0c4f-4afe-93d2-4ec814593793
+spec:
+  ingressClassName: alb
+  rules:
+    - host: 4tier.store
+      http:
+        paths:
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: mainweb-svc
+                port:
+                  number: 80
+          - pathType: Prefix
+            path: /login
+            backend:
+              service:
+                name: loginweb-svc
+                port:
+                  number: 80
+          - pathType: Prefix
+            path: /member
+            backend:
+              service:
+                name: memberweb-svc
+                port:
+                  number: 80
+          - pathType: Prefix
+            path: /board
+            backend:
+              service:
+                name: boardweb-svc
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - www.4tier.store
+      secretName: example-tls-secret
