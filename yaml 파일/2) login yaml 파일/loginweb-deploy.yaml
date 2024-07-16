@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  generation: 1
+  labels:
+    app: loginweb
+  name: loginweb
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      app: loginweb
+  template:
+    metadata:
+      labels:
+        app: loginweb
+    spec:
+      nodeSelector: 
+        app: loginweb
+      containers:
+      - image: nginx:1.14
+        ports:
+        - containerPort: 8001
+        name: loginweb
+        resources:
+          requests:
+            cpu: 200m
+            memory: 200Mi
+          limits:
+            cpu: 200m
+            memory: 200Mi

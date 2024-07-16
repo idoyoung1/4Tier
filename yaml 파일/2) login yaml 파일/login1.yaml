@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: login1
+  name: login1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: login1
+  template:
+    metadata:
+      labels:
+        app: login1
+    spec:
+      containers:
+      - image: nginx:1.14 
+        name: login
+        ports:
+        - containerPort: 8080
+      nodeSelector:
+        app: loginweb 

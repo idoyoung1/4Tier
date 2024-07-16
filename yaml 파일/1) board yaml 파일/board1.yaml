@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  generation: 1
+  labels:
+    app: baord1
+  name: board1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: board1
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: board1
+    spec:
+      nodeSelector:
+        app: boardweb          
+      containers:
+      - image: nginx:1.14
+        name: board
+        ports:
+        - containerPort: 8080

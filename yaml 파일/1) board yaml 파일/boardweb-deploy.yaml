@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: boardweb
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      app: boardweb
+  template:
+    metadata:
+      labels:
+        app: boardweb
+    spec:
+      containers:
+      - name: boardweb-container
+        image: nginx:1.14
+        ports:
+        - containerPort: 8002
+        resources:
+          requests:
+            cpu: 200m
+            memory: 200Mi
+          limits:
+            cpu: 200m
+            memory: 200Mi
+      nodeSelector:
+        app: boardweb
